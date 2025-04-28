@@ -38,8 +38,7 @@ team_t team = {
 #define DSIZE 8             /* Double word size (bytes) */
 #define CHUNKSIZE (1 << 12) /* Extend heap by this amount (bytes) */
 // ⭐ 가용 블록에 필요한 최소 크기 (Header:4 + Footer:4 + NextPtr:8 + PrevPtr:8 = 24)
-#define MIN_FREE_BLOCK_SIZE (WSIZE + WSIZE + DSIZE + DSIZE)
-
+#define MIN_FREE_BLOCK_SIZE 24
 #define MAX(x, y) ((x) > (y) ? (x) : (y))
 
 /* Pack a size and allocated bit into a word */
@@ -74,7 +73,7 @@ team_t team = {
 
 
 /* Global variables */
-static char *heap_listp = 0;     /* Pointer to first block */
+static char *heap_listp = NULL;     /* Pointer to first block */
 static char *free_list_tail = NULL; /* Pointer to the tail of the free list (LIFO) */
 
 
@@ -160,7 +159,7 @@ static void place(void *bp, size_t asize)
     // void *prev_free = GET_PREV_FREE(bp); // Get free list pointers *before* removing
     // void *next_free = GET_NEXT_FREE(bp);
 
-    printf("[DEBUG] place: bp=%p, req_size=%lu, block_size=%lu\n", bp, asize, csize);
+    //printf("[DEBUG] place: bp=%p, req_size=%lu, block_size=%lu\n", bp, asize, csize);
 
     // ⭐ Remove the block from free list *before* modifying it.
     // --- 수정 시작: Heuristic 검사 제거 ---
@@ -171,9 +170,9 @@ static void place(void *bp, size_t asize)
         remove_free_block(bp);
         removed_successfully = true; // Assume removal was okay if no crash here
         // printf("[DEBUG] Completed remove_free_block for bp=%p\n", bp);
-    } else {
-        printf("[WARNING] place: Invalid bp=%p provided. Skipping remove.\n", bp);
-    }
+    } //else {
+    //     printf("[WARNING] place: Invalid bp=%p provided. Skipping remove.\n", bp);
+    // }
     // --- 수정 끝 ---
 
 
@@ -202,11 +201,11 @@ static void place(void *bp, size_t asize)
             PUT(FTRP(bp), PACK(csize, 1));
             // printf("[DEBUG] place: Allocated entire block %lu at %p\n", csize, bp);
         }
-    } else {
-         printf("[ERROR] place: Did not proceed with allocation for bp=%p due to invalid state or failed removal.\n", bp);
-         // Depending on requirements, you might want to signal an error differently
-         // or attempt to recover, but for now, just logging is safer.
-    }
+    } //else {
+    //      printf("[ERROR] place: Did not proceed with allocation for bp=%p due to invalid state or failed removal.\n", bp);
+    //      // Depending on requirements, you might want to signal an error differently
+    //      // or attempt to recover, but for now, just logging is safer.
+    // }
 }
 
 

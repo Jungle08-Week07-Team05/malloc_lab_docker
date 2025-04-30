@@ -1,2 +1,4 @@
 *.o
-mdriver
+mdriverDS_Store
+.DS_Store
+
